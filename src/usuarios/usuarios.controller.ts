@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Post, Put, Res } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { Usuario } from 'src/Usuario';
-import { constants } from 'buffer';
-import { Response } from 'express'; // Add this import
+import { Response } from 'express'; 
+
 
 @Controller('usuarios')
 export class UsuariosController {

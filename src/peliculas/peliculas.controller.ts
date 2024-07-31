@@ -3,6 +3,7 @@ import { PeliculasService } from './peliculas.service';
 import { Response } from 'express';
 import { Pelicula } from 'src/Pelicula';
 import { Reproduccion } from 'src/Reproduccion';
+import { UsuariosService } from 'src/usuarios/usuarios.service';
 
 
 
@@ -10,7 +11,8 @@ import { Reproduccion } from 'src/Reproduccion';
 @Controller('peliculas')
 export class PeliculasController {
     usuariosService: any;
-    constructor(private readonly peliculasService: PeliculasService) { }
+    constructor(private readonly peliculasService: PeliculasService, private readonly usuarioService: UsuariosService) { }
+
 
 
     @Get(':id')
@@ -98,7 +100,20 @@ export class PeliculasController {
                 return 0; 
     }
 }
+@Get('sugerencias/:usuarioId')
+    sugerirPeliculas(@Param('usuarioId') usuarioId: number, @Res() response: Response) {
+        const usuario = this.usuariosService.obtenerUsuarioPorId(usuarioId);
+        if (!usuario) {
+            return response.status(404).send({ error: 'Usuario no encontrado' });
+        }
+        const sugerencias = this.peliculasService.obtenerPeliculasPorGenero(usuario.generosFavoritos);
+        
+        return response.status(200).send(sugerencias);
+    }
 }
+
+
+
 
 
 
