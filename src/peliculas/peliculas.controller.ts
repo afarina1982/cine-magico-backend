@@ -2,12 +2,14 @@ import { Body, Controller, Delete, Get, Param, Post, Query, Res } from '@nestjs/
 import { PeliculasService } from './peliculas.service';
 import { Response } from 'express';
 import { Pelicula } from 'src/Pelicula';
+import { Reproduccion } from 'src/Reproduccion';
 
 
 
 
 @Controller('peliculas')
 export class PeliculasController {
+    usuariosService: any;
     constructor(private readonly peliculasService: PeliculasService) { }
 
 
@@ -45,6 +47,57 @@ export class PeliculasController {
     agregarPelicula(@Body() pelicula: Pelicula): void {
         this.peliculasService.crearPelicula(pelicula);
     }
+
+    @Post(':id/reproducir')
+    async reproducirPelicula(@Param('id') id: number, @Body('usuarioId') usuarioId: number, @Res() response: Response) {
+        
+        const pelicula = await this.peliculasService.obtenerPeliculasPorId(id);
+        if (!pelicula) {
+            return response.status(404).send({ error: 'La película no existe' });
+        }
+
+        
+        const usuario = await this.usuariosService.obtenerUsuarioPorId(usuarioId);
+        if (!usuario) {
+            return response.status(404).send({ error: 'Usuario no encontrado' });
+        }
+
+        
+        if (pelicula.estreno && usuario.planSuscripcion !== 'Premium') {
+            return response.status(404).send({ error: 'Su plan no permite reproducir la película' });
+        }
+
+        
+        const edadUsuario = usuario.edad;
+        if (edadUsuario < this.obtenerEdadMinima(pelicula.calificacion)) {
+            return response.status(404).send({ error: 'La película no es apta para su edad' });
+        }
+
+        
+        const reproduccion: Reproduccion = {
+            id: Date.now(), // Generar un ID único para la reproducción
+            pelicula: pelicula,
+            fecha: new Date(),
+        };
+        await this.usuariosService.agregarReproduccion(usuarioId, reproduccion);
+        
+        return response.status(200).send({ mensaje: 'Reproducción exitosa', reproduccion });
+    }
+
+    private obtenerEdadMinima(calificacion: string): number {
+        switch (calificacion) {
+            case 'TE':
+                return 0;
+            case 'TE+7':
+                return 7;
+            case 'MA14':
+                return 14;
+            case 'MA18':
+                return 18;
+            default:
+                return 0; 
+    }
+}
 }
 
 

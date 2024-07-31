@@ -9,7 +9,8 @@ export class PeliculasService {
         this.peliculas.push(new Pelicula(1, 'Toy Story', 'Animación', 1995, 'TE', 81, 'Inglés', ['Español', 'Francés', 'Alemán'], false));
         this.peliculas.push(new Pelicula(2, 'Harry Potter y la piedra filosofal', 'Fantasía', 2001, 'TE+7', 152, 'Inglés', ['Español', 'Francés', 'Alemán'], false));
         this.peliculas.push(new Pelicula(3, 'El juego del miedo', 'Terror', 2004, 'MA14', 117, 'Inglés', ['Español', 'Alemán'], false));
-
+        this.peliculas.push(new Pelicula(4,'Deadpool & Wolverine','Acción',2024,'MA18',127,'Inglés',['Español'],true));
+            
     }
     crearPelicula(pelicula: Pelicula): void {
         pelicula.id = this.peliculas.length + 1;
